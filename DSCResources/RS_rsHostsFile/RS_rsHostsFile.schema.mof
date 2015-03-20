@@ -1,0 +1,7 @@
+[ClassVersion("1.0"), FriendlyName("rsHostsFile")] 
+class RS_rsHostsFile : OMI_BaseResource
+{
+  [Key] string hostName;
+  [Key] string ipAddress;
+  [write,ValueMap{"Present", "Absent"},Values{"Present", "Absent"}] string Ensure;
+};
