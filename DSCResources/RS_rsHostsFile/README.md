@@ -1,4 +1,4 @@
-rsHostsFile
+RS_rsHostsFile
 ==================
 ```PoSh
 

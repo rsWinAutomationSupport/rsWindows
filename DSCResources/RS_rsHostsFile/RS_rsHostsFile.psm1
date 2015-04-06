@@ -19,7 +19,7 @@ ConvertFrom-StringData @'
 
 if (Test-Path $PSScriptRoot\en-us)
 {
-    Import-LocalizedData LocalizedData -filename rsHostsFile.psd1
+    Import-LocalizedData LocalizedData -filename RS_rsHostsFile.psd1
 }
 
 function Get-TargetResource
@@ -82,24 +82,26 @@ function Set-TargetResource
     )     
 
     $hostEntry = "`n${ipAddress}`t${hostName}"
+    $hostsfile = "${env:windir}\system32\drivers\etc\hosts"
 
     try {
 
         if ($Ensure -eq 'Present')
         {
             Write-Verbose ($localizedData.CreatingHostsFileEntry -f $hostName, $ipAddress)
-            Add-Content -Path "${env:windir}\system32\drivers\etc\hosts" -Value $hostEntry -Force -Encoding ASCII
+            (Get-Content $hostsfile) -notmatch "^[^#]*$hostname" | Set-Content $hostsfile -Encoding ASCII
+            Add-Content -Path $hostsfile -Value $hostEntry -Force -Encoding ASCII
             Write-Verbose ($localizedData.HostsFileEntryAdded -f $hostName, $ipAddress)
         }
         else
         {
             Write-Verbose ($localizedData.RemovingHostsFileEntry -f $hostName, $ipAddress)
-            ((Get-Content "${env:windir}\system32\drivers\etc\hosts") -notmatch "^\s*$") -notmatch "^[^#]*$ipAddress\s+$hostName" | Set-Content "${env:windir}\system32\drivers\etc\hosts"
+            (Get-Content $hostsfile) -notmatch "^[^#]*$hostname" | Set-Content $hostsfile -Encoding ASCII
             Write-Verbose ($localizedData.HostsFileEntryRemoved -f $hostName, $ipAddress)
         }
     }
     catch {
-            $exception = $_    
+            $exception = $_
             Write-Verbose ($LocalizedData.AnErrorOccurred -f $exception.message)
             while ($exception.InnerException -ne $null)
             {
